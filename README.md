@@ -118,12 +118,4 @@ Source: [NYC TLC Trip Record Data](https://www.nyc.gov/site/tlc/about/tlc-trip-r
 - No-code visual transformations (compiles to Spark under the hood)
 - Real-world troubleshooting — compression codecs, schema type resolution
 
-## Part of Data Engineering Portfolio
 
-| Project | Stack | Dataset | Status |
-|---|---|---|---|
-| Project 1 | ADF Only | NYC Taxi | Done |
-| Project 2 | ADF + Databricks | Chicago Crime | Upcoming |
-| Project 3 | Delta Architecture | Stack Overflow Survey | Upcoming |
-| Project 4 | Incremental Load | GitHub Events | Upcoming |
-| Project 5 | Medallion Architecture | Olist E-Commerce | Done |
