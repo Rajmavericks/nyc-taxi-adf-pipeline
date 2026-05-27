@@ -1,0 +1,97 @@
+{
+	"name": "PL_Silver_Transform",
+	"properties": {
+		"activities": [
+			{
+				"name": "NB_Silver_Transform",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/rajinigcp@gmail.com/olist/silver/nb_silver_transform",
+					"baseParameters": {
+						"run_date": {
+							"value": "@pipeline().parameters.run_date",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_ADB_Olist",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Check_Silver_Count",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "NB_Silver_Transform",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greater(int(activity('NB_Silver_Transform').output.runOutput), 0)",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Fail_Silver_Empty",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": {
+									"value": "@concat('Silver table is empty for run date: ', pipeline().parameters.run_date)",
+									"type": "Expression"
+								},
+								"errorCode": "500"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Log_Silver_Success",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Pass",
+								"value": "No issue in pipeline"
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"run_date": {
+				"type": "string",
+				"defaultValue": "@formatDateTime(utcNow(), 'yyyy-MM-dd')"
+			}
+		},
+		"variables": {
+			"Pass": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-05-26T11:18:16Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

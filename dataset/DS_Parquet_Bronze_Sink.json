@@ -1,0 +1,30 @@
+{
+	"name": "DS_Parquet_Bronze_Sink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLS_Olist",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"folder_name": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "*",
+				"folderPath": {
+					"value": "bronze/parquet/@{dataset().folder_name}",
+					"type": "Expression"
+				},
+				"fileSystem": "olist-ecommerce"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

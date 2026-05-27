@@ -1,0 +1,108 @@
+{
+	"name": "PL_Gold_Aggregation",
+	"properties": {
+		"activities": [
+			{
+				"name": "NB_Gold_Revenue",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/rajinigcp@gmail.com/olist/gold/nb_gold_revenue_mart",
+					"baseParameters": {
+						"run_date ": {
+							"value": "@pipeline().parameters.run_date",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_ADB_Olist",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "NB_Gold_RFM",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "NB_Gold_Revenue",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/rajinigcp@gmail.com/olist/gold/nb_gold_rfm_mart",
+					"baseParameters": {
+						"run_date ": {
+							"value": "@pipeline().parameters.run_date",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_ADB_Olist",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "NB_Gold_Product",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "NB_Gold_RFM",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/rajinigcp@gmail.com/olist/gold/nb_gold_product_mart",
+					"baseParameters": {
+						"run_date ": {
+							"value": "@pipeline().parameters.run_date",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_ADB_Olist",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"run_date": {
+				"type": "string",
+				"defaultValue": "@formatDateTime(utcNow(), 'yyyy-MM-dd')"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-05-26T11:22:54Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,89 @@
+{
+	"name": "DF_NycTaxi_Cleanse_Aggregate",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_NycTaxi_Processed_Parquet",
+						"type": "DatasetReference"
+					},
+					"name": "SourceNycTaxi"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_NycTaxi_Aggregated_Parquet",
+						"type": "DatasetReference"
+					},
+					"name": "SinkAggregated"
+				}
+			],
+			"transformations": [
+				{
+					"name": "filternulls"
+				},
+				{
+					"name": "DeriveColumns"
+				},
+				{
+					"name": "AggregateByZoneHour"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          VendorID as integer,",
+				"          passenger_count as double,",
+				"          trip_distance as double,",
+				"          RatecodeID as double,",
+				"          store_and_fwd_flag as string,",
+				"          PULocationID as integer,",
+				"          DOLocationID as integer,",
+				"          payment_type as double,",
+				"          fare_amount as double,",
+				"          extra as double,",
+				"          mta_tax as double,",
+				"          tip_amount as double,",
+				"          tolls_amount as double,",
+				"          improvement_surcharge as double,",
+				"          total_amount as double,",
+				"          congestion_surcharge as double,",
+				"          Airport_fee as double,",
+				"          pickup_ts as long,",
+				"          dropoff_ts as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'parquet') ~> SourceNycTaxi",
+				"SourceNycTaxi filter(!isNull(fare_amount) && !isNull(trip_distance) && trip_distance > 0 && fare_amount > 0) ~> filternulls",
+				"filternulls derive(pickup_date = toDate(toTimestamp(pickup_ts * 1000L)),",
+				"          pickup_hour = hour(toTimestamp(pickup_ts * 1000L)),",
+				"          trip_duration_mins = toInteger((dropoff_ts - pickup_ts) / 60),",
+				"          revenue_per_mile = iif(trip_distance > 0, round(total_amount / trip_distance, 2), toDouble(0))) ~> DeriveColumns",
+				"DeriveColumns aggregate(groupBy(pickup_date,",
+				"          pickup_hour,",
+				"          PULocationID,",
+				"          DOLocationID),",
+				"     total_trips = count(1),",
+				"          total_passengers = sum(passenger_count),",
+				"          avg_fare = round(avg(fare_amount), 2),",
+				"          avg_distance = round(avg(trip_distance), 2),",
+				"          avg_duration_mins = round(avg(toDouble(trip_duration_mins)), 2),",
+				"          total_revenue = round(sum(total_amount), 2),",
+				"          avg_tip = round(avg(tip_amount), 2)) ~> AggregateByZoneHour",
+				"AggregateByZoneHour sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> SinkAggregated"
+			]
+		}
+	}
+}

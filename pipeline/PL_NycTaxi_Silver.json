@@ -1,0 +1,37 @@
+{
+	"name": "PL_NycTaxi_Silver",
+	"properties": {
+		"activities": [
+			{
+				"name": "DF_NycTaxi_Cleanse_Aggregate",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DF_NycTaxi_Cleanse_Aggregate",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "NYC"
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-05-27T13:55:26Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,24 @@
+{
+	"name": "DS_NycTaxi_Processed_Parquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLS_Olist",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "NYC"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "yellowtaxi/processed",
+				"fileSystem": "nyctaxi"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
